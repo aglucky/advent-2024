@@ -31,37 +31,37 @@ sortLists :: ([Int], [Int]) -> ([Int], [Int])
 sortLists (xs, ys) = (sort xs, sort ys)
 
 getDistanceSum :: ([Int], [Int]) -> Int
-getDistanceSum (left, right) = 
+getDistanceSum (left, right) =
     if length left /= length right
         then error "Lists must have the same length"
-    else 
+    else
         let (sortedLeft, sortedRight) = sortLists (left, right)
         in sum $ zipWith (\x y -> abs (x - y)) sortedLeft sortedRight
 
 getCountsOfNum :: Int -> [Int] -> Int
 getCountsOfNum _ [] = 0
-getCountsOfNum toMatch (head:rest) = 
-    if toMatch == head 
-        then 1 + getCountsOfNum toMatch rest 
+getCountsOfNum toMatch (head:rest) =
+    if toMatch == head
+        then 1 + getCountsOfNum toMatch rest
         else getCountsOfNum toMatch rest
 
 getSimilarityScore :: ([Int], [Int]) -> Int
-getSimilarityScore (leftList, rightList) = 
+getSimilarityScore (leftList, rightList) =
     sum $ map (\num -> num * getCountsOfNum num rightList) leftList
 
 partOne :: IO ()
 partOne = do
     testInput <- readInputFile "day1/test.txt"
-    putStrLn $ "First Part Test Solution: " ++ show (getDistanceSum $ parseLists $ splitStringAt '\n' $ testInput)
+    putStrLn $ "First Part Test Solution: " ++ show (getDistanceSum $ parseLists $ splitStringAt '\n' testInput)
     finalInput <- readInputFile "day1/input.txt"
-    putStrLn $ "First Part Final Solution: " ++ show (getDistanceSum $ parseLists $ splitStringAt '\n' $ finalInput)
+    putStrLn $ "First Part Final Solution: " ++ show (getDistanceSum $ parseLists $ splitStringAt '\n' finalInput)
 
 partTwo :: IO ()
 partTwo = do
     testInput <- readInputFile "day1/test.txt"
-    putStrLn $ "Second Part Test Solution: " ++ show (getSimilarityScore $ parseLists $ splitStringAt '\n' $ testInput)
+    putStrLn $ "Second Part Test Solution: " ++ show (getSimilarityScore $ parseLists $ splitStringAt '\n' testInput)
     finalInput <- readInputFile "day1/input.txt"
-    putStrLn $ "Second Part Final Solution: " ++ show (getSimilarityScore $ parseLists $ splitStringAt '\n' $ finalInput)
+    putStrLn $ "Second Part Final Solution: " ++ show (getSimilarityScore $ parseLists $ splitStringAt '\n' finalInput)
 
 main :: IO ()
 main = do
