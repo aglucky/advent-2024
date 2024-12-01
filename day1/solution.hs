@@ -52,16 +52,16 @@ getSimilarityScore (leftList, rightList) =
 partOne :: IO ()
 partOne = do
     testInput <- readInputFile "day1/test.txt"
-    putStrLn $ "First Part Test Solution: " ++ show (getDistanceSum $ parseLists $ splitStringAt '\n' testInput)
+    putStrLn $ "First Part Test Solution: " ++ show (getDistanceSum . parseLists . splitStringAt '\n' $ testInput)
     finalInput <- readInputFile "day1/input.txt"
-    putStrLn $ "First Part Final Solution: " ++ show (getDistanceSum $ parseLists $ splitStringAt '\n' finalInput)
+    putStrLn $ "First Part Final Solution: " ++ show (getDistanceSum . parseLists . splitStringAt '\n' $ finalInput)
 
 partTwo :: IO ()
 partTwo = do
     testInput <- readInputFile "day1/test.txt"
-    putStrLn $ "Second Part Test Solution: " ++ show (getSimilarityScore $ parseLists $ splitStringAt '\n' testInput)
+    putStrLn $ "Second Part Test Solution: " ++ show (getSimilarityScore . parseLists . splitStringAt '\n' $ testInput)
     finalInput <- readInputFile "day1/input.txt"
-    putStrLn $ "Second Part Final Solution: " ++ show (getSimilarityScore $ parseLists $ splitStringAt '\n' finalInput)
+    putStrLn $ "Second Part Final Solution: " ++ show (getSimilarityScore . parseLists . splitStringAt '\n' $ finalInput)
 
 main :: IO ()
 main = do
