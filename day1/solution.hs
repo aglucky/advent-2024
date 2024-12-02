@@ -7,6 +7,7 @@ import System.IO ( hGetContents, openFile, IOMode(ReadMode) )
 import Data.Maybe (fromMaybe)
 import Data.Char (toLower)
 import Data.List (sort)
+import qualified Data.Map as Map
 
 readInputFile :: FilePath -> IO String
 readInputFile filePath = do
@@ -38,16 +39,13 @@ getDistanceSum (left, right) =
         let (sortedLeft, sortedRight) = sortLists (left, right)
         in sum $ zipWith (\x y -> abs (x - y)) sortedLeft sortedRight
 
-getCountsOfNum :: Int -> [Int] -> Int
-getCountsOfNum _ [] = 0
-getCountsOfNum toMatch (head:rest) =
-    if toMatch == head
-        then 1 + getCountsOfNum toMatch rest
-        else getCountsOfNum toMatch rest
+makeNumCountMap :: [Int] -> Map.Map Int Int
+makeNumCountMap = foldr (\num acc -> Map.insertWith (+) num 1 acc) Map.empty
 
 getSimilarityScore :: ([Int], [Int]) -> Int
 getSimilarityScore (leftList, rightList) =
-    sum $ map (\num -> num * getCountsOfNum num rightList) leftList
+    let rightCounts = makeNumCountMap rightList
+    in sum $ map (\num -> num * Map.findWithDefault 0 num rightCounts) leftList
 
 partOne :: IO ()
 partOne = do
