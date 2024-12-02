@@ -45,21 +45,25 @@ makeNumCountMap = foldr (\num acc -> Map.insertWith (+) num 1 acc) Map.empty
 getSimilarityScore :: ([Int], [Int]) -> Int
 getSimilarityScore (leftList, rightList) =
     let rightCounts = makeNumCountMap rightList
-    in sum $ map (\num -> num * Map.findWithDefault 0 num rightCounts) leftList
+    in sum . map (\num -> num * Map.findWithDefault 0 num rightCounts) $ leftList
 
 partOne :: IO ()
 partOne = do
+    let solution = getDistanceSum . parseLists . splitStringAt '\n'
+
     testInput <- readInputFile "day1/test.txt"
-    putStrLn $ "First Part Test Solution: " ++ show (getDistanceSum . parseLists . splitStringAt '\n' $ testInput)
+    putStrLn $ "First Part Test Solution: " ++ show (solution testInput)
     finalInput <- readInputFile "day1/input.txt"
-    putStrLn $ "First Part Final Solution: " ++ show (getDistanceSum . parseLists . splitStringAt '\n' $ finalInput)
+    putStrLn $ "First Part Final Solution: " ++ show (solution finalInput)
 
 partTwo :: IO ()
 partTwo = do
+    let solution = getSimilarityScore . parseLists . splitStringAt '\n'
+
     testInput <- readInputFile "day1/test.txt"
-    putStrLn $ "Second Part Test Solution: " ++ show (getSimilarityScore . parseLists . splitStringAt '\n' $ testInput)
+    putStrLn $ "Second Part Test Solution: " ++ show (solution testInput)
     finalInput <- readInputFile "day1/input.txt"
-    putStrLn $ "Second Part Final Solution: " ++ show (getSimilarityScore . parseLists . splitStringAt '\n' $ finalInput)
+    putStrLn $ "Second Part Final Solution: " ++ show (solution finalInput)
 
 main :: IO ()
 main = do

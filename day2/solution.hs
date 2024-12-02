@@ -21,6 +21,9 @@ splitStringAt delimiter input = case dropWhile (== delimiter) input of
 parseLevels :: String -> [[Int]]
 parseLevels input = map (map read . splitStringAt ' ') (splitStringAt '\n' input)
 
+maxDistance :: Int
+maxDistance = 3
+
 isLevelValid :: [Int] -> Bool
 isLevelValid (first : second : rest) =
   if first < second
@@ -29,42 +32,46 @@ isLevelValid (first : second : rest) =
 isLevelValid _ = True
 
 isLevelValidInner :: [Int] -> (Int -> Int -> Bool) -> Bool
-isLevelValidInner (first : second : rest) comp =
-  comp first second
+isLevelValidInner (first : second : rest) sameDir =
+  sameDir first second
     && abs (first - second) < 4
     && first /= second
-    && isLevelValidInner (second : rest) comp
+    && isLevelValidInner (second : rest) sameDir
 isLevelValidInner _ _ = True
 
 isLevelValidWithReplaceInner :: [Int] -> (Int -> Int -> Bool) -> Bool
-isLevelValidWithReplaceInner (first : second : third : rest) comp =
-  if comp first second
-    && comp second third
-    && abs (first - second) < 4
-    && abs (second - third) < 4
+isLevelValidWithReplaceInner (first : second : third : rest) sameDir =
+  if sameDir first second
+    && sameDir second third
+    && abs (first - second) <= maxDistance
+    && abs (second - third) <= maxDistance
     && first /= second
     && second /= third
-    then isLevelValidWithReplaceInner (second : third : rest) comp
-    else 
-      isLevelValidInner (first : third : rest) comp
-      || isLevelValidInner (second : third : rest) comp
-      || isLevelValidInner (first : second : rest) comp
+    then isLevelValidWithReplaceInner (second : third : rest) sameDir
+    else
+      isLevelValidInner (first : third : rest) sameDir
+        || isLevelValidInner (second : third : rest) sameDir
+        || isLevelValidInner (first : second : rest) sameDir
 isLevelValidWithReplaceInner _ _ = True
 
 isLevelValidWithReplace :: [Int] -> Bool
 isLevelValidWithReplace (first : second : third : rest) =
-  if abs (first - second) < 4 && abs (second - third) < 4 && first /= second && second /= third
+  if abs (first - second) <= maxDistance
+    && abs (second - third) <= maxDistance
+    && first /= second
+    && second /= third
     then
-      if first < second && second < third
-        then isLevelValidWithReplaceInner (first : second : third : rest) (<)
-        else
-          if first > second && second > third
-            then isLevelValidWithReplaceInner (first : second : third : rest) (>)
-            else tryWithoutOne [first, second, third] rest
-    else tryWithoutOne [first, second, third] rest
+      case (compare first second, compare second third) of
+        (LT, LT) -> isLevelValidWithReplaceInner (first : second : third : rest) (<)
+        (GT, GT) -> isLevelValidWithReplaceInner (first : second : third : rest) (>)
+        _ -> tryWithReplacement [first, second, third] rest
+    else tryWithReplacement [first, second, third] rest
   where
-    tryWithoutOne [a, b, c] rest = isLevelValid (a : c : rest) || isLevelValid (b : c : rest) || isLevelValid (a : b : rest)
-isLevelValidWithReplace (first : second: rest) = abs (first - second) < 4
+    tryWithReplacement [a, b, c] rest =
+      isLevelValid (a : c : rest)
+        || isLevelValid (b : c : rest)
+        || isLevelValid (a : b : rest)
+isLevelValidWithReplace (first : second : rest) = abs (first - second) <= maxDistance
 isLevelValidWithReplace _ = True
 
 numValidLevels :: ([Int] -> Bool) -> [[Int]] -> Int
@@ -72,19 +79,21 @@ numValidLevels isValid levels = length $ filter isValid levels
 
 partOne :: IO ()
 partOne = do
-  testInput <- readInputFile "day2/test.txt"
-  putStrLn $ "First Part Test Solution: " ++ show (numValidLevels isLevelValid . parseLevels $ testInput)
+  let solution = numValidLevels isLevelValid . parseLevels
 
+  testInput <- readInputFile "day2/test.txt"
+  putStrLn $ "First Part Test Solution: " ++ show (solution testInput)
   finalInput <- readInputFile "day2/input.txt"
-  putStrLn $ "First Part Final Solution: " ++ show (numValidLevels isLevelValid . parseLevels $ finalInput)
+  putStrLn $ "First Part Final Solution: " ++ show (solution finalInput)
 
 partTwo :: IO ()
 partTwo = do
-  testInput <- readInputFile "day2/test.txt"
-  putStrLn $ "Second Part Test Solution: " ++ show (numValidLevels isLevelValidWithReplace . parseLevels $ testInput)
+  let solution = numValidLevels isLevelValidWithReplace . parseLevels
 
+  testInput <- readInputFile "day2/test.txt"
+  putStrLn $ "Second Part Test Solution: " ++ show (solution testInput)
   finalInput <- readInputFile "day2/input.txt"
-  putStrLn $ "Second Part Final Solution: " ++ show (numValidLevels isLevelValidWithReplace . parseLevels $ finalInput)
+  putStrLn $ "Second Part Final Solution: " ++ show (solution finalInput)
 
 main :: IO ()
 main = do
