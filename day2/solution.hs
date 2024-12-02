@@ -3,7 +3,6 @@ Advent of Code 2024 Day 2
 Adam Gluck
 -}
 
-import Control.Arrow (Arrow (second))
 import System.IO (IOMode (ReadMode), hGetContents, openFile)
 
 readInputFile :: FilePath -> IO String
