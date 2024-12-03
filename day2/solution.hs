@@ -76,22 +76,28 @@ isLevelValidWithReplace _ = True
 numValidLevels :: ([Int] -> Bool) -> [[Int]] -> Int
 numValidLevels isValid levels = length $ filter isValid levels
 
+testPath :: String
+testPath = "day2/test.txt"
+
+finalPath :: String
+finalPath = "day2/input.txt"
+
 partOne :: IO ()
 partOne = do
   let solution = numValidLevels isLevelValid . parseLevels
 
-  testInput <- readInputFile "day2/test.txt"
+  testInput <- readInputFile testPath
   putStrLn $ "First Part Test Solution: " ++ show (solution testInput)
-  finalInput <- readInputFile "day2/input.txt"
+  finalInput <- readInputFile finalPath
   putStrLn $ "First Part Final Solution: " ++ show (solution finalInput)
 
 partTwo :: IO ()
 partTwo = do
   let solution = numValidLevels isLevelValidWithReplace . parseLevels
 
-  testInput <- readInputFile "day2/test.txt"
+  testInput <- readInputFile testPath
   putStrLn $ "Second Part Test Solution: " ++ show (solution testInput)
-  finalInput <- readInputFile "day2/input.txt"
+  finalInput <- readInputFile finalPath
   putStrLn $ "Second Part Final Solution: " ++ show (solution finalInput)
 
 main :: IO ()

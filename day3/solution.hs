@@ -25,8 +25,8 @@ findMulSum = sum . map (uncurry (*))
 data Token = MulPair Int Int | Do | Dont
     deriving (Show)
 
-parseResults :: String -> [Token]
-parseResults str =
+parseTokens :: String -> [Token]
+parseTokens str =
     let mulPattern = "mul\\(([1-9][0-9]*),([1-9][0-9]*)\\)|do\\(\\)|don't\\(\\)"
         matches = getAllTextMatches (str =~ mulPattern) :: [String]
         
@@ -50,22 +50,28 @@ sumWithoutInvalid results =
         processResult (curSum, True) (MulPair x y) = (curSum + (x * y), True)
         processResult (curSum, False) _ = (curSum, False)
 
+testPath :: String
+testPath = "day3/test.txt"
+
+finalPath :: String
+finalPath = "day3/input.txt"
+
 partOne :: IO ()
 partOne = do
   let solution = findMulSum . parseMulPairs
 
-  testInput <- readInputFile "day3/test.txt"
+  testInput <- readInputFile testPath
   putStrLn $ "First Part Test Solution: " ++ show (solution testInput)
-  finalInput <- readInputFile "day3/input.txt"
+  finalInput <- readInputFile finalPath
   putStrLn $ "First Part Final Solution: " ++ show (solution finalInput)
 
 partTwo :: IO ()
 partTwo = do
-  let solution = sumWithoutInvalid . parseResults
+  let solution = sumWithoutInvalid . parseTokens
 
-  testInput <- readInputFile "day3/test.txt"
+  testInput <- readInputFile testPath
   putStrLn $ "Second Part Test Solution: " ++ show (solution testInput)
-  finalInput <- readInputFile "day3/input.txt"
+  finalInput <- readInputFile finalPath
   putStrLn $ "Second Part Final Solution: " ++ show (solution finalInput)
 
 main :: IO ()
