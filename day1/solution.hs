@@ -38,7 +38,7 @@ getDistanceSum (left, right) =
     then error "Lists must have the same length"
     else
       let (sortedLeft, sortedRight) = sortLists (left, right)
-        in sum $ zipWith (\x y -> abs (x - y)) sortedLeft sortedRight
+       in sum $ zipWith (\x y -> abs (x - y)) sortedLeft sortedRight
 
 makeNumCountMap :: [Int] -> Map.Map Int Int
 makeNumCountMap = foldr (\num acc -> Map.insertWith (+) num 1 acc) Map.empty

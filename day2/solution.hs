@@ -59,11 +59,10 @@ isLevelValidWithReplace (first : second : third : rest) =
     && abs (second - third) <= maxDistance
     && first /= second
     && second /= third
-    then
-      case (compare first second, compare second third) of
-        (LT, LT) -> isLevelValidWithReplaceInner (first : second : third : rest) (<)
-        (GT, GT) -> isLevelValidWithReplaceInner (first : second : third : rest) (>)
-        _ -> tryWithReplacement [first, second, third] rest
+    then case (compare first second, compare second third) of
+      (LT, LT) -> isLevelValidWithReplaceInner (first : second : third : rest) (<)
+      (GT, GT) -> isLevelValidWithReplaceInner (first : second : third : rest) (>)
+      _ -> tryWithReplacement [first, second, third] rest
     else tryWithReplacement [first, second, third] rest
   where
     tryWithReplacement [a, b, c] rest =
