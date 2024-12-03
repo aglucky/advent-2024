@@ -58,9 +58,9 @@ partOne :: IO ()
 partOne = do
   let solution = getDistanceSum . parseLists . splitStringAt '\n'
 
-  testInput <- readInputFile "day1/test.txt"
+  testInput <- readInputFile testPath
   putStrLn $ "First Part Test Solution: " ++ show (solution testInput)
-  finalInput <- readInputFile "day1/input.txt"
+  finalInput <- readInputFile finalPath
   putStrLn $ "First Part Final Solution: " ++ show (solution finalInput)
 
 partTwo :: IO ()

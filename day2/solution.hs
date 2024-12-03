@@ -33,7 +33,7 @@ isLevelValid _ = True
 isLevelValidInner :: [Int] -> (Int -> Int -> Bool) -> Bool
 isLevelValidInner (first : second : rest) sameDir =
   sameDir first second
-    && abs (first - second) < 4
+    && abs (first - second) <= maxDistance
     && first /= second
     && isLevelValidInner (second : rest) sameDir
 isLevelValidInner _ _ = True

@@ -27,8 +27,8 @@ data Token = MulPair Int Int | Do | Dont
 
 parseTokens :: String -> [Token]
 parseTokens str =
-  let mulPattern = "mul\\(([1-9][0-9]*),([1-9][0-9]*)\\)|do\\(\\)|don't\\(\\)"
-      matches = getAllTextMatches (str =~ mulPattern) :: [String]
+  let tokenPattern = "mul\\(([1-9][0-9]*),([1-9][0-9]*)\\)|do\\(\\)|don't\\(\\)"
+      matches = getAllTextMatches (str =~ tokenPattern) :: [String]
 
       parseMatch match
         | "mul(" `isPrefixOf` match =
