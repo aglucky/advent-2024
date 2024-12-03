@@ -32,9 +32,9 @@ parseTokens str =
 
       parseMatch match
         | "mul(" `isPrefixOf` match =
-            let nums = match =~ "([1-9][0-9]*),([1-9][0-9]*)" :: [[String]]
-                [_, n1, n2] = head nums
-             in MulPair (read n1) (read n2)
+            let nums = parseMulPairs match
+                (n1, n2) = head nums
+             in MulPair n1 n2
         | "do()" == match = Do
         | "don't()" == match = Dont
         | otherwise = error "Invalid pattern match"
