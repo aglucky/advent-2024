@@ -16,16 +16,15 @@ getDiagonalLines :: [String] -> [String]
 getDiagonalLines grid =
   [getDiagonalLine i 0 grid | i <- [0 .. rowLen - 1]]
     ++ [getDiagonalLine 0 j grid | j <- [1 .. colLen - 1]]
-    ++ [getReverseDiagonalLine i (colLen - 1) grid | i <- [0 .. rowLen - 1]]
-    ++ [getReverseDiagonalLine 0 j grid | j <- [0 .. colLen - 2]]
+    ++ [getDiagonalLine i 0 flippedGrid | i <- [0 .. rowLen - 1]]
+    ++ [getDiagonalLine 0 j flippedGrid | j <- [1 .. colLen - 1]]
   where
+    flippedGrid = map reverse grid
     rowLen = length grid
     colLen = length $ head grid
-    
+
     getDiagonalLine i j grid =
       [(grid !! (i + k)) !! (j + k) | k <- [0 .. min (rowLen - 1 - i) (colLen - 1 - j)]]
-    getReverseDiagonalLine i j grid =
-      [(grid !! (i + k)) !! (j - k) | k <- [0 .. min (rowLen - 1 - i) j]]
 
 numWordsInLine :: String -> String -> Int
 numWordsInLine word line =
