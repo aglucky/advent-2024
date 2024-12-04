@@ -37,7 +37,7 @@ numWordsInLine word line =
 
 numWordsInGrid :: [String] -> Int
 numWordsInGrid grid =
-  sum [sum (map xmasCount grid) + sum (map xmasCount . reverse $ grid) | grid <- grids]
+  sum [sum (map xmasCount grid) + sum (map (xmasCount . reverse) grid) | grid <- grids]
   where
     xmasCount = numWordsInLine "XMAS"
     grids = [grid, transpose grid, getDiagonalLines grid]
