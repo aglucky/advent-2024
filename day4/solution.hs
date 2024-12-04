@@ -12,21 +12,20 @@ readInputFile filePath = do
   handle <- openFile filePath ReadMode
   hGetContents handle
 
-parseWordSearch :: String -> [String]
-parseWordSearch = lines
-
 getDiagonalLines :: [String] -> [String]
 getDiagonalLines grid =
-  [getDiagonalLine i 0 grid | i <- [0 .. n - 1]]
-    ++ [getDiagonalLine 0 j grid | j <- [1 .. n - 1]]
-    ++ [getReverseDiagonalLine i (n - 1) grid | i <- [0 .. n - 1]]
-    ++ [getReverseDiagonalLine 0 j grid | j <- [0 .. n - 2]]
+  [getDiagonalLine i 0 grid | i <- [0 .. rowLen - 1]]
+    ++ [getDiagonalLine 0 j grid | j <- [1 .. colLen - 1]]
+    ++ [getReverseDiagonalLine i (colLen - 1) grid | i <- [0 .. rowLen - 1]]
+    ++ [getReverseDiagonalLine 0 j grid | j <- [0 .. colLen - 2]]
   where
-    n = length grid
+    rowLen = length grid
+    colLen = length $ head grid
+    
     getDiagonalLine i j grid =
-      [(grid !! (i + k)) !! (j + k) | k <- [0 .. min (n - 1 - i) (n - 1 - j)]]
+      [(grid !! (i + k)) !! (j + k) | k <- [0 .. min (rowLen - 1 - i) (colLen - 1 - j)]]
     getReverseDiagonalLine i j grid =
-      [(grid !! (i + k)) !! (j - k) | k <- [0 .. min (n - 1 - i) j]]
+      [(grid !! (i + k)) !! (j - k) | k <- [0 .. min (rowLen - 1 - i) j]]
 
 numWordsInLine :: String -> String -> Int
 numWordsInLine word line =
@@ -38,24 +37,26 @@ numWordsInLine word line =
 
 numWordsInGrid :: [String] -> Int
 numWordsInGrid grid =
-  sum [sum (map xmasCount grid) + sum (map (xmasCount . reverse) grid) | grid <- grids]
+  sum [sum (map xmasCount grid) + sum (map xmasCount . reverse $ grid) | grid <- grids]
   where
     xmasCount = numWordsInLine "XMAS"
     grids = [grid, transpose grid, getDiagonalLines grid]
 
-getNeighbors :: [String] -> [(Int, Int)] -> [(Maybe Char, Maybe Char, Maybe Char, Maybe Char)]
-getNeighbors grid = map (getAdjacentChars grid)
+getAllNeighbors :: [String] -> [(Int, Int)] -> [[Maybe Char]]
+getAllNeighbors grid = map (getNeighbors grid)
   where
-    n = length grid
-    getAdjacentChars grid (i, j) =
-      ( safeGet (i - 1) (j - 1),
+    rowLen = length grid
+    colLen = length . (!!) grid
+    getNeighbors grid (i, j) =
+      [ safeGet (i - 1) (j - 1),
         safeGet (i - 1) (j + 1),
         safeGet (i + 1) (j - 1),
         safeGet (i + 1) (j + 1)
-      )
+      ]
       where
         safeGet row col
-          | row >= 0 && row < n && col >= 0 && col < n = Just ((grid !! row) !! col)
+          | row >= 0 && row < rowLen && col >= 0 && col < colLen row =
+              Just ((grid !! row) !! col)
           | otherwise = Nothing
 
 findAPositions :: [String] -> [(Int, Int)]
@@ -64,10 +65,10 @@ findAPositions grid =
   where
     n = length grid
 
-getNumValidSquares :: [(Maybe Char, Maybe Char, Maybe Char, Maybe Char)] -> Int
+getNumValidSquares :: [[Maybe Char]] -> Int
 getNumValidSquares candidates =
-  let isNotNull (a, b, c, d) = all isJust [a, b, c, d]
-      toChars (a, b, c, d) = [fromJust a, fromJust b, fromJust c, fromJust d]
+  let isNotNull = all isJust
+      toChars = map fromJust
       isValid candidate = candidate `elem` ["MSMS", "MMSS", "SSMM", "SMSM"]
    in length $ filter (\x -> isNotNull x && isValid (toChars x)) candidates
 
@@ -79,7 +80,7 @@ finalPath = "day4/input.txt"
 
 partOne :: IO ()
 partOne = do
-  let solution = numWordsInGrid . parseWordSearch
+  let solution = numWordsInGrid . lines
 
   testInput <- readInputFile testPath
   putStrLn $ "First Part Test Solution: " ++ show (solution testInput)
@@ -89,8 +90,8 @@ partOne = do
 partTwo :: IO ()
 partTwo = do
   let solution input =
-        let grid = parseWordSearch input
-         in getNumValidSquares . getNeighbors grid $ findAPositions grid
+        let grid = lines input
+         in getNumValidSquares . getAllNeighbors grid $ findAPositions grid
 
   testInput <- readInputFile testPath
   putStrLn $ "Second Part Test Solution: " ++ show (solution testInput)
