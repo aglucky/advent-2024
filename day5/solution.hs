@@ -52,7 +52,7 @@ fixUpdateOrder ruleMap update = topoSort nums graph
         Map.map (filter (`elem` nums)) ruleMap
 
     topoSort :: [Int] -> Map Int [Int] -> [Int]
-    topoSort nodes graph = fst $ foldl visit ([], Set.empty) nodes
+    topoSort nodes graph = fst . foldl visit ([], Set.empty) $ nodes
       where
         visit (sorted, visited) node
           | node `Set.member` visited = (sorted, visited)
