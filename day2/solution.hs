@@ -10,15 +10,8 @@ readInputFile filePath = do
   handle <- openFile filePath ReadMode
   hGetContents handle
 
-splitStringAt :: Char -> String -> [String]
-splitStringAt delimiter input = case dropWhile (== delimiter) input of
-  "" -> []
-  remaining -> match : splitStringAt delimiter restOfString
-    where
-      (match, restOfString) = break (== delimiter) remaining
-
 parseLevels :: String -> [[Int]]
-parseLevels input = map (map read . splitStringAt ' ') (splitStringAt '\n' input)
+parseLevels = map (map read . words) . lines
 
 maxDistance :: Int
 maxDistance = 3

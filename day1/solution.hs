@@ -14,16 +14,9 @@ readInputFile filePath = do
   handle <- openFile filePath ReadMode
   hGetContents handle
 
-splitStringAt :: Char -> String -> [String]
-splitStringAt delimiter input = case dropWhile (== delimiter) input of
-  "" -> []
-  remaining -> match : splitStringAt delimiter restOfString
-    where
-      (match, restOfString) = break (== delimiter) remaining
-
 parseLists :: [String] -> ([Int], [Int])
 parseLists lines = do
-  let pairs = map (map read . splitStringAt ' ') lines
+  let pairs = map (map read . words) lines
   let filteredPairs = filter (\pair -> length pair == 2) pairs
   if length filteredPairs /= length pairs
     then error "All pairs must have length 2"
@@ -56,7 +49,7 @@ finalPath = "day1/input.txt"
 
 partOne :: IO ()
 partOne = do
-  let solution = getDistanceSum . parseLists . splitStringAt '\n'
+  let solution = getDistanceSum . parseLists . lines
 
   testInput <- readInputFile testPath
   putStrLn $ "First Part Test Solution: " ++ show (solution testInput)
@@ -65,7 +58,7 @@ partOne = do
 
 partTwo :: IO ()
 partTwo = do
-  let solution = getSimilarityScore . parseLists . splitStringAt '\n'
+  let solution = getSimilarityScore . parseLists . lines
 
   testInput <- readInputFile testPath
   putStrLn $ "Second Part Test Solution: " ++ show (solution testInput)
