@@ -26,7 +26,9 @@ parseRule rule = (read first, read second)
     (first, _ : second) = break (== '|') rule
 
 buildRuleMap :: [String] -> Map Int [Int]
-buildRuleMap = foldl (\acc (before, after) -> Map.insertWith (++) before [after] acc) Map.empty . map parseRule
+buildRuleMap = foldl addToMap Map.empty . map parseRule
+  where
+    addToMap acc (before, after) = Map.insertWith (++) before [after] acc
 
 parseUpdate :: String -> [Int]
 parseUpdate = map read . words . map (\c -> if c == ',' then ' ' else c)
@@ -39,9 +41,9 @@ isUpdateValid ruleMap update = fst $ checkValid (head nums) (True, tail nums)
       | not valid = (False, [])
       | null remaining = (True, [])
       | otherwise =
-          let nextVals = Map.findWithDefault [] curr ruleMap
+          let nextValRule = Map.findWithDefault [] curr ruleMap
               nextNum = head remaining
-           in if nextNum `elem` nextVals
+           in if nextNum `elem` nextValRule
                 then checkValid nextNum (True, tail remaining)
                 else (False, [])
 
@@ -54,17 +56,20 @@ fixUpdateOrder ruleMap update = topoSort nums graph
         Map.map (filter (`elem` nums)) ruleMap
 
     topoSort :: [Int] -> Map Int [Int] -> [Int]
-    topoSort vertices graph = fst $ foldl visit ([], Set.empty) vertices
+    topoSort nodes graph = fst $ foldl visit ([], Set.empty) nodes
       where
-        visit (sorted, visited) v
-          | v `Set.member` visited = (sorted, visited)
+        visit (sorted, visited) node
+          | node `Set.member` visited = (sorted, visited)
           | otherwise =
               let (newSorted, newVisited) =
                     foldl
                       visit
-                      (sorted, Set.insert v visited)
-                      (Map.findWithDefault [] v graph)
-               in (v : newSorted, newVisited)
+                      (sorted, Set.insert node visited)
+                      (Map.findWithDefault [] node graph)
+               in (node : newSorted, newVisited)
+
+getMiddleElement :: [a] -> a
+getMiddleElement update = update !! (length update `div` 2)
 
 testPath :: String
 testPath = "day5/test.txt"
@@ -77,8 +82,8 @@ partOne = do
   let solution input =
         let (rules, updates) = parseRulesAndUpdate input
             ruleMap = buildRuleMap rules
-            getMiddleElement update = update !! (length update `div` 2)
-         in sum . map (getMiddleElement . parseUpdate) . filter (isUpdateValid ruleMap) $ updates
+            validUpdates = filter (isUpdateValid ruleMap) updates
+         in sum . map (getMiddleElement . parseUpdate) $ validUpdates
 
   testInput <- readInputFile testPath
   putStrLn $ "First Part Test Solution: " ++ show (solution testInput)
@@ -90,8 +95,8 @@ partTwo = do
   let solution input =
         let (rules, updates) = parseRulesAndUpdate input
             ruleMap = buildRuleMap rules
-            getMiddleElement update = update !! (length update `div` 2)
-         in sum . map (getMiddleElement . fixUpdateOrder ruleMap) . filter (not . isUpdateValid ruleMap) $ updates
+            invalidUpdates = filter (isUpdateValid ruleMap) updates
+         in sum . map (getMiddleElement . fixUpdateOrder ruleMap) $ invalidUpdates
 
   testInput <- readInputFile testPath
   putStrLn $ "Second Part Test Solution: " ++ show (solution testInput)
