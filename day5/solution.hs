@@ -48,8 +48,8 @@ fixUpdateOrder ruleMap update = topoSort nums graph
   where
     nums = parseUpdate update
     graph =
-      Map.filterWithKey (\k _ -> k `elem` nums) $
-        Map.map (filter (`elem` nums)) ruleMap
+      Map.map (filter (`elem` nums)) $
+      Map.filterWithKey (\k _ -> k `elem` nums) ruleMap
 
     topoSort :: [Int] -> Map Int [Int] -> [Int]
     topoSort nodes graph = fst . foldl visit ([], Set.empty) $ nodes
