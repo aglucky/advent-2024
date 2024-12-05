@@ -34,18 +34,14 @@ parseUpdate :: String -> [Int]
 parseUpdate = map read . words . map (\c -> if c == ',' then ' ' else c)
 
 isUpdateValid :: Map Int [Int] -> String -> Bool
-isUpdateValid ruleMap update = fst $ checkValid (head nums) (True, tail nums)
+isUpdateValid ruleMap update =
+  let nums = parseUpdate update
+   in isValid nums
   where
-    nums = parseUpdate update
-    checkValid curr (valid, remaining)
-      | not valid = (False, [])
-      | null remaining = (True, [])
-      | otherwise =
-          let nextValRule = Map.findWithDefault [] curr ruleMap
-              nextNum = head remaining
-           in if nextNum `elem` nextValRule
-                then checkValid nextNum (True, tail remaining)
-                else (False, [])
+    isValid (first : second : rest) =
+      let nextValRules = Map.findWithDefault [] first ruleMap
+       in second `elem` nextValRules && isValid (second : rest)
+    isValid _ = True
 
 fixUpdateOrder :: Map Int [Int] -> String -> [Int]
 fixUpdateOrder ruleMap update = topoSort nums graph
@@ -95,7 +91,7 @@ partTwo = do
   let solution input =
         let (rules, updates) = parseRulesAndUpdate input
             ruleMap = buildRuleMap rules
-            invalidUpdates = filter (isUpdateValid ruleMap) updates
+            invalidUpdates = filter (not . isUpdateValid ruleMap) updates
          in sum . map (getMiddleElement . fixUpdateOrder ruleMap) $ invalidUpdates
 
   testInput <- readInputFile testPath
